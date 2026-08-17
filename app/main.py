@@ -82,3 +82,43 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         "payload": task.payload,
         "status": task.status
     }
+
+
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
+
+    if not task:
+        return {"error": "Task not found"}
+
+    db.delete(task)
+    db.commit()
+
+    return {"message": "Task deleted successfully"}
+
+@app.put("/tasks/{task_id}")
+def update_task(
+    task_id: int,
+    type: str,
+    payload: dict,
+    status: str,
+    db: Session = Depends(get_db)
+):
+    task = db.query(Task).filter(Task.id == task_id).first()
+
+    if not task:
+        return {"error": "Task not found"}
+
+    task.type = type
+    task.payload = payload
+    task.status = status
+
+    db.commit()
+    db.refresh(task)
+
+    return {
+        "id": task.id,
+        "type": task.type,
+        "payload": task.payload,
+        "status": task.status
+    }
