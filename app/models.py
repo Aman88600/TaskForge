@@ -9,7 +9,10 @@ Base = declarative_base()
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(
+        Integer,
+        primary_key=True
+    )
 
     type = Column(
         String,
@@ -24,7 +27,17 @@ class Task(Base):
     status = Column(
         String,
         nullable=False,
-        default="pending"
+        default="queued"
+    )
+
+    result = Column(
+        JSONB,
+        nullable=True
+    )
+
+    error = Column(
+        String,
+        nullable=True
     )
 
     created_at = Column(

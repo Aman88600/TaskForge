@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from .database import engine, SessionLocal
 from .models import Base, Task
+from .redis_client import redis_client
 
 
 app = FastAPI(title="TaskForge")
@@ -43,7 +44,7 @@ def create_task(
     db.add(task)
     db.commit()
     db.refresh(task)
-
+    redis_client.rpush("task_queue", task.id)
     return {
         "id": task.id,
         "type": task.type,
@@ -80,7 +81,9 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
         "id": task.id,
         "type": task.type,
         "payload": task.payload,
-        "status": task.status
+        "status": task.status,
+        "result": task.result,
+        "error" : task.error
     }
 
 
